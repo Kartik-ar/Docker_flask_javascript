@@ -1,0 +1,83 @@
+<head>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<script>
+    function openForm() {
+     document.getElementById("myForm").style.display = "block";
+    }
+
+    function closeForm() {
+    document.getElementById("myForm").style.display = "none";
+    }
+    function create() {
+        var n = document.forms["form-container"]["conname"].value;
+        var i = document.forms["form-container"]["image"].value;
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "http://6e8d41715555.ngrok.io/create?img="+i+"&nm="+n, true)
+        xhr.send();
+    }
+    function rm(name){
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "http://6e8d41715555.ngrok.io/rm?name=" + name, true)
+        xhr.send();
+        location.reload();
+
+    }
+    function stop(name){
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "http://6e8d41715555.ngrok.io/stop?name=" + name, true)
+        xhr.send();
+        location.reload();
+
+    }
+    function exec(name) {
+        localStorage.setItem("Name",name);
+        window.open('file:///Users/kartik_rama_arora/Documents/Python_ws/Javascript%20docker/docker_exec.html','_newtab')
+        location.reload();
+    }
+    function run() {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "http://6e8d41715555.ngrok.io/psa", true)
+            xhr.send();
+            
+            xhr.onload = function ps() {
+                var x = this.response;
+                var parser = new DOMParser();
+                var p = parser.parseFromString(x,"text/xml");
+                var txt = "<table><tr><th>Container Name</th><th>Container ID</th><th> Status </th><th> </th></tr>";
+                for (let i = 0; i < p.getElementsByTagName('name').length; i++) { 
+                    txt += "<tr>" + "<td>" + p.getElementsByTagName('name')[i].childNodes[0].nodeValue + "</td>" +
+                        "<td>" + p.getElementsByTagName('id')[i].childNodes[0].nodeValue + "</td>" + 
+                        "<td>" + p.getElementsByTagName('status')[i].childNodes[0].nodeValue + "</td>" + 
+                        "<td>" + `<button type='button' id='btn-post' name='${p.getElementsByTagName('name')[i].childNodes[0].nodeValue}' onclick='exec(this.name);'> Launch </button>` + "</td>" +
+                        "<td>"+ `<button type='button' id='rmc' name='${p.getElementsByTagName('name')[i].childNodes[0].nodeValue}' onclick='rm(this.name);'> Delete </button>` +
+                        "<td>"+ `<button type='button' id='rmc' name='${p.getElementsByTagName('name')[i].childNodes[0].nodeValue}' onclick='stop(this.name);'> Stop </button>` + "</tr>";
+                    }
+                var i = document.getElementById('run').innerHTML
+                document.getElementById('run').innerHTML = i + txt + "</table>"; 
+            }
+        }
+    window.onload = run();
+</script>
+<body>
+    <h1> DOCKER GUI </h1>
+    <div id="appbar"> 
+        <button id='create' class="open-button" onclick="openForm()"> Create Container</button>  
+        <div class="form-popup" id="myForm">
+        <form name="form-container">
+            <button type="button" class="cancel" onclick="closeForm()">Close</button><br>
+            <h1>Create New Container</h1><br>
+            <label for="email"><b>Container Name</b></label><br>
+            <input type="text" placeholder="Enter Container Name" name="conname" required><br>
+            
+            <label for="psw"><b>Image Name</b></label><br>
+            <input type="text" placeholder="Enter Image Name" name="image" required><br>
+
+            <button type="submit" class="btn" onclick="create()">Create</button><br>
+            
+        </form>
+        </div>
+    </div>
+<div id="run">  </div>
+</body>
+

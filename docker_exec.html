@@ -1,0 +1,75 @@
+<head>
+<style>
+  body {
+    background-color: black;
+  }
+  p1 {
+    color: white;
+  }
+  input {
+    background-color: black;
+    color: white;
+    border: black;
+  }
+  i {
+    background-color: rgb(246, 176, 69);
+    color: rgb(246, 176, 69);
+    animation-name: blink;
+    animation-duration: 4s;
+  }
+  @keyframes blink {
+  from {background-color: rgb(246, 176, 69);}
+  to {background-color:rgb(151, 150, 150);}
+  }
+  pre {
+    color: white;
+  }
+</style>    
+</head>
+
+<script>
+    
+    async function session() {
+      await execcmd();
+      await on();
+    
+    }
+    function execcmd() {
+      var cmd = document.getElementById('cmd').value;
+      var cm = new XMLHttpRequest();
+      var n = localStorage.getItem('Name');
+      var i;
+      cm.open('GET', 'http://6e8d41715555.ngrok.io/execmd?name='+n+"&cmd="+cmd, true);
+      //cm.setRequestHeader('Access-Control-Request-Headers', '*');
+      //cm.setRequestHeader('content-type', 'application/string');
+      cm.send();  
+      cm.onload = function ps() {
+        var x = this.responseText;
+        var t = '<pre>' + x + '</pre>';
+        var r = document.getElementById('exec').innerHTML;
+        document.getElementById('exec').innerHTML = r + t + "<br>";
+        window.on();
+    }
+    }
+    function on() {
+    //var n = localStorage.getItem('Name');
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', 'http://6e8d41715555.ngrok.io/exec', true);
+    xhr.send();
+    xhr.onload = function ps() {
+      var x = this.response;
+      var txt = "<p1 id='in'>" + x + "</p1>" + 
+      "<i>''</i>" + "<input type='text' id='cmd' onchange='execcmd();' value='' name='fname'><br>";
+      var p = document.getElementById('exec').innerHTML;
+      document.getElementById('exec').innerHTML = p + txt;
+      
+      //document.getElementById("fname").addEventListener("keypress", );    
+    }
+    }
+    window.onload = on();
+</script>
+
+<body>
+<div id='exec'>
+</div>        
+</body>
